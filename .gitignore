@@ -1,0 +1,15 @@
+# Runtime user data — produced by save_log.php at runtime, not source
+/logs/
+
+# OS junk
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Editor swap files
+*.swp
+*.swo
+*~
+
+# Node (defensive — no node deps in this project today)
+node_modules/
