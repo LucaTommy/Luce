@@ -1,0 +1,212 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Strumento Poster</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/editor.css">
+</head>
+<body>
+
+  <!-- Loading overlay -->
+  <div id="loading-overlay" class="loading-overlay">
+    <div class="loading-inner">
+      <div class="loading-spinner"></div>
+      <span>Caricamento font…</span>
+    </div>
+  </div>
+
+  <!-- ═══════════════════════════════════════════════ -->
+  <!-- Editor                                         -->
+  <!-- ═══════════════════════════════════════════════ -->
+  <div id="screen-editor" class="screen active">
+
+    <!-- Top Bar -->
+    <div class="topbar">
+      <span class="topbar-title" id="poster-size-label">210 × 297 mm</span>
+
+      <div class="topbar-zoom">
+        <button id="zoom-out" title="Zoom indietro">−</button>
+        <span id="zoom-label">100%</span>
+        <button id="zoom-in" title="Zoom avanti">+</button>
+        <button id="zoom-fit" title="Adatta allo schermo">Adatta</button>
+      </div>
+
+      <div class="topbar-actions">
+        <button id="btn-undo" class="topbar-btn" title="Annulla (Ctrl+Z)">↩ Annulla</button>
+        <button id="btn-redo" class="topbar-btn" title="Ripristina (Ctrl+Y)">↪ Ripristina</button>
+        <label class="topbar-btn" title="Importa JSON">
+          ↑ Importa
+          <input type="file" id="import-json-input" accept=".json" style="display:none">
+        </label>
+        <a class="topbar-btn" href="dashboard.html" title="Cronologia esportazioni">⏱ Cronologia</a>
+        <div class="export-dropdown" id="export-dropdown">
+          <button class="topbar-btn topbar-btn--accent" id="btn-export">Esporta ▾</button>
+          <div class="export-menu" id="export-menu">
+            <button data-format="png">PNG</button>
+            <button data-format="pdf">PDF</button>
+            <button data-format="json">JSON</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="editor-body">
+
+      <!-- ═══════════════ LEFT PANEL ═══════════════ -->
+      <aside class="left-panel" id="left-panel">
+
+        <!-- Format Switcher -->
+        <div class="size-switcher">
+          <span class="size-switch-label">Formato</span>
+          <div class="size-switch-btns">
+            <button class="size-switch-btn" data-id="a3">A3</button>
+            <button class="size-switch-btn" data-id="a4">A4</button>
+            <button class="size-switch-btn" data-id="a5Landscape">A5 Oriz.</button>
+            <button class="size-switch-btn" data-id="instagram">IG</button>
+            <button class="size-switch-btn" data-id="instagramStory">IG Story</button>
+            <button class="size-switch-btn" data-id="hd">HD</button>
+            <button class="size-switch-btn" data-id="custom" id="btn-custom-toggle">Pers.</button>
+          </div>
+        </div>
+
+        <!-- Custom size inputs -->
+        <div class="custom-size-row" id="custom-size-row">
+          <input type="number" id="custom-w" class="field-input" placeholder="L" min="10" max="2000" value="210">
+          <span class="custom-sep">×</span>
+          <input type="number" id="custom-h" class="field-input" placeholder="A" min="10" max="2000" value="297">
+          <span class="custom-unit">mm</span>
+          <button class="custom-apply-btn" id="btn-apply-custom">OK</button>
+        </div>
+
+        <!-- ── Sfondo ── -->
+        <div class="panel-section" id="section-bg">
+          <div class="section-header" data-target="section-bg-body">
+            <span>Sfondo &amp; Gradiente</span>
+            <div class="section-header-right">
+              <button class="help-btn" data-tip="Clicca il pulsante colore per scegliere un colore solido dalla tavolozza. Nella sezione gradiente, scegli 2 colori, regola direzione e bilanciamento.">?</button>
+              <span class="chevron">▾</span>
+            </div>
+          </div>
+          <div class="section-body" id="section-bg-body">
+            <div class="section-subheader">Colore solido</div>
+            <div id="bg-solid-picker" class="swatch-group"></div>
+            <div class="section-subheader" style="margin-top:12px">Gradiente</div>
+            <div id="gradient-panel-container"></div>
+          </div>
+        </div>
+
+        <!-- ── Layout e Testi ── -->
+        <div class="panel-section" id="section-text">
+          <div class="section-header" data-target="section-text-body">
+            <span>Layout e Testi</span>
+            <div class="section-header-right">
+              <button class="help-btn" data-tip="Inserisci Data, Luogo, Titolo e Testo. Scegli posizione di Data+Luogo, tipografia del titolo (Regular/Black), dimensioni e colori.">?</button>
+              <span class="chevron">▾</span>
+            </div>
+          </div>
+          <div class="section-body" id="section-text-body">
+            <div id="text-section-content"></div>
+          </div>
+        </div>
+
+        <!-- ── Sfondo ── -->
+        <div class="panel-section" id="section-library">
+          <div class="section-header collapsed-hd" data-target="section-library-body">
+            <span>Libreria</span>
+            <div class="section-header-right">
+              <button class="help-btn" data-tip="Clicca su una lettera per aggiungerla al canvas come elemento decorativo. Trascina la lettera sul canvas per spostarla.">?</button>
+              <span class="chevron">▾</span>
+            </div>
+          </div>
+          <div class="section-body collapsed" id="section-library-body">
+            <div id="library-tabs-container"></div>
+            <div id="overlay-controls"></div>
+          </div>
+        </div>
+
+        <!-- ── Importa Logo ── -->
+        <div class="panel-section" id="section-logoimport">
+          <div class="section-header collapsed-hd" data-target="section-logoimport-body">
+            <span>Importa Logo</span>
+            <div class="section-header-right">
+              <button class="help-btn" data-tip="Importa un logo PNG o SVG. I loghi si posizionano automaticamente in fondo alla pagina, distribuiti orizzontalmente.">?</button>
+              <span class="chevron">▾</span>
+            </div>
+          </div>
+          <div class="section-body collapsed" id="section-logoimport-body">
+            <label class="upload-btn" style="display:block;text-align:center;width:100%;margin-bottom:8px">
+              + Aggiungi logo
+              <input type="file" id="add-logo-input" accept="image/png,image/svg+xml,.svg" style="display:none">
+            </label>
+            <div id="logo-controls"></div>
+          </div>
+        </div>
+
+        <!-- ── QR Code ── -->
+        <div class="panel-section" id="section-qr">
+          <div class="section-header collapsed-hd" data-target="section-qr-body">
+            <span>QR Code</span>
+            <div class="section-header-right">
+              <button class="help-btn" data-tip="Genera un QR code personalizzato. Inserisci un URL, regola dimensione e posizione.">?</button>
+              <span class="chevron">▾</span>
+            </div>
+          </div>
+          <div class="section-body collapsed" id="section-qr-body">
+            <div id="qr-controls"></div>
+          </div>
+        </div>
+
+        <!-- ── Sfondo Pattern ── -->
+        <div class="panel-section" id="section-patternbg">
+          <div class="section-header collapsed-hd" data-target="section-patternbg-body">
+            <span>Sfondo Pattern</span>
+            <div class="section-header-right">
+              <button class="help-btn" data-tip="Sfondo decorativo a griglia con icone. Scegli colonne, righe, icona e colore, poi clicca Genera.">?</button>
+              <span class="chevron">▾</span>
+            </div>
+          </div>
+          <div class="section-body collapsed" id="section-patternbg-body">
+            <div id="pattern-bg-controls"></div>
+          </div>
+        </div>
+
+      </aside>
+
+      <div class="sidebar-resize-handle" id="sidebar-resize-handle"></div>
+
+      <!-- ═══════════════ CANVAS AREA ═══════════════ -->
+      <main class="canvas-area" id="canvas-area">
+        <div id="artboard">
+          <canvas id="canvas"></canvas>
+          <!-- Selection outline for letter overlays. DOM-rendered so exports
+               stay clean and so it can follow the cursor smoothly during drag.
+               JS toggles display + sets left/top/width/height in canvas-pixel
+               coords (artboard is in canvas-pixel space). -->
+          <div id="overlay-outline" class="overlay-outline" aria-hidden="true"></div>
+        </div>
+      </main>
+
+    </div>
+  </div>
+
+  <!-- Hidden SVG for text measurement (getBBox) — needs large viewport for accurate rendering -->
+  <svg id="measureSVG" xmlns="http://www.w3.org/2000/svg"
+       style="position:absolute;top:-9999px;left:-9999px;opacity:0;pointer-events:none;width:4000px;height:200px;overflow:visible;">
+  </svg>
+
+  <!-- Scripts — plain (no type="module"), loaded in dependency order -->
+  <script src="js/vendor/jspdf.umd.min.js"></script>
+  <script src="js/font-data.js"></script>
+  <script src="js/config.js"></script>
+  <script src="js/assets.js"></script>
+  <script src="js/wrap.js"></script>
+  <script src="js/render.js"></script>
+  <script src="js/qrcode.js"></script>
+  <script src="js/app.js"></script>
+  <script src="js/export.js"></script>
+
+  <div id="tutorial-overlay" class="tutorial-overlay" style="display:none"></div>
+</body>
+</html>
